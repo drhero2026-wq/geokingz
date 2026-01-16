@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قاعدة البيانات الشاملة | قارة أفريقيا 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Tajawal', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .hero-bg { background: radial-gradient(circle at top right, #1e293b, #0f172a); }
+        .country-card { transition: transform 0.2s ease, box-shadow 0.2s ease; border: 1px solid #e2e8f0; }
+        .country-card:hover { transform: translateY(-4px); box-shadow: 0 12px 20px -5px rgba(0,0,0,0.1); border-color: #3b82f6; }
+        /* Custom Scrollbar for Big Data */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <nav class="bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <span class="text-xl font-bold tracking-tight">GEO<span class="text-blue-600">AFRICA</span> <span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded">Enterprise v2.0</span></span>
+            </div>
+            <div class="relative hidden md:block w-1/3">
+                <input type="text" id="searchInput" onkeyup="searchData()" placeholder="ابحث عن أي دولة، عاصمة، أو عملة..." 
+                class="w-full bg-gray-100 border-none rounded-xl px-5 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 transition">
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero-bg text-white py-16 px-6 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto relative z-10">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">قاعدة البيانات الجيومترية لأفريقيا</h1>
+            <p class="text-blue-200 text-lg opacity-90 max-w-3xl">نظام مركزي لإدارة بيانات 54 دولة إفريقية. دقة البيانات، سرعة الفهرسة، وتكامل الذكاء الاصطناعي في منصة واحدة.</p>
+            <div class="flex gap-6 mt-8">
+                <div class="text-center">
+                    <span class="block text-3xl font-bold" id="totalCount">54</span>
+                    <span class="text-xs text-blue-300 uppercase tracking-widest">دولة مسجلة</span>
+                </div>
+                <div class="w-px h-12 bg-blue-500/30"></div>
+                <div class="text-center">
+                    <span class="block text-3xl font-bold">1.4B</span>
+                    <span class="text-xs text-blue-300 uppercase tracking-widest">إجمالي السكان</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto py-12 px-6">
+        <div id="noResults" class="hidden text-center py-20">
+            <p class="text-gray-400 text-xl">عذراً، لم يتم العثور على بيانات تطابق بحثك.</p>
+        </div>
+        <div id="mainGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            </div>
+    </main>
+
+    <script>
+        // مصفوفة البيانات الضخمة لجميع دول أفريقيا (54 دولة)
+        // ملاحظة: تم تقدير السكان بناءً على أحدث التوجهات لعام 2025/2026
+        const africaDB = [
+            { n: "مصر", c: "القاهرة", p: "112,000,000", cr: "الجنيه المصري", img: "EG" },
+            { n: "نيجيريا", c: "أبوجا", p: "223,000,000", cr: "النايرا النيجيرية", img: "NG" },
+            { n: "الجزائر", c: "الجزائر", p: "46,000,000", cr: "الدينار الجزائري", img: "DZ" },
+            { n: "المغرب", c: "الرباط", p: "38,000,000", cr: "الدرهم المغربي", img: "MA" },
+            { n: "إثيوبيا", c: "أديس أبابا", p: "128,000,000", cr: "البير الإثيوبي", img: "ET" },
+            { n: "جنوب أفريقيا", c: "بريتوريا", p: "61,000,000", cr: "الراند الجنوب أفريقي", img: "ZA" },
+            { n: "تونس", c: "تونس", p: "12,500,000", cr: "الدينار التونسي", img: "TN" },
+            { n: "ليبيا", c: "طرابلس", p: "7,200,000", cr: "الدينار الليبي", img: "LY" },
+            { n: "السودان", c: "الخرطوم", p: "48,000,000", cr: "الجنيه السوداني", img: "SD" },
+            { n: "كينيا", c: "نيروبي", p: "56,000,000", cr: "الشلن الكيني", img: "KE" },
+            { n: "تنزانيا", c: "دودوما", p: "67,000,000", cr: "الشلن التنزاني", img: "TZ" },
+            { n: "غانا", c: "أكرا", p: "34,000,000", cr: "السيدي الغاني", img: "GH" },
+            { n: "أوغندا", c: "كامبالا", p: "49,000,000", cr: "الشلن الأوغندي", img: "UG" },
+            { n: "أنغولا", c: "لواندا", p: "36,000,000", cr: "كوانزا أنغولي", img: "AO" },
+            { n: "موزمبيق", c: "مابوتو", p: "33,000,000", cr: "متيكال موزمبيقي", img: "MZ" },
+            { n: "مدغشقر", c: "أنتاناناريفو", p: "30,000,000", cr: "أرياري مدغشقر", img: "MG" },
+            { n: "ساحل العاج", c: "ياموسوكرو", p: "29,000,000", cr: "فرنك غرب أفريقيا", img: "CI" },
+            { n: "الكاميرون", c: "ياوندي", p: "28,000,000", cr: "فرنك وسط أفريقيا", img: "CM" },
+            { n: "النيجر", c: "نيامي", p: "27,000,000", cr: "فرنك غرب أفريقيا", img: "NE" },
+            { n: "مالي", c: "باماكو", p: "23,000,000", cr: "فرنك غرب أفريقيا", img: "ML" },
+            { n: "بوركينا فاسو", c: "واغادوغو", p: "23,000,000", cr: "فرنك غرب أفريقيا", img: "BF" },
+            { n: "ملاوي", c: "ليلونغوي", p: "21,000,000", cr: "كواشا ملاوية", img: "MW" },
+            { n: "زامبيا", c: "لوساكا", p: "20,500,000", cr: "كواشا زامبية", img: "ZM" },
+            { n: "السنغال", c: "داكار", p: "18,500,000", cr: "فرنك غرب أفريقيا", img: "SN" },
+            { n: "تشاد", c: "نجامينا", p: "18,000,000", cr: "فرنك وسط أفريقيا", img: "TD" },
+            { n: "الصومال", c: "مقديشو", p: "18,000,000", cr: "الشلن الصومالي", img: "SO" },
+            { n: "زيمبابوي", c: "هراري", p: "16,500,000", cr: "دولار زيمبابوي", img: "ZW" },
+            { n: "غينيا", c: "كوناكري", p: "14,500,000", cr: "فرنك غيني", img: "GN" },
+            { n: "رواندا", c: "كيغالي", p: "14,000,000", cr: "فرنك رواندي", img: "RW" },
+            { n: "بنين", c: "بورتو نوفو", p: "14,000,000", cr: "فرنك غرب أفريقيا", img: "BJ" },
+            { n: "بوروندي", c: "جيتيغا", p: "13,500,000", cr: "فرنك بوروندي", img: "BI" },
+            { n: "جنوب السودان", c: "جوبا", p: "11,500,000", cr: "جنيه جنوب السودان", img: "SS" },
+            { n: "إريتريا", c: "أسمرة", p: "3,700,000", cr: "ناكفا إريترية", img: "ER" },
+            { n: "سيراليون", c: "فريتاون", p: "8,800,000", cr: "ليون سيراليوني", img: "SL" },
+            { n: "توغو", c: "لومي", p: "9,000,000", cr: "فرنك غرب أفريقيا", img: "TG" },
+            { n: "جمهورية أفريقيا الوسطى", c: "بانغي", p: "5,700,000", cr: "فرنك وسط أفريقيا", img: "CF" },
+            { n: "ليبيريا", c: "مونروفيا", p: "5,500,000", cr: "دولار ليبيري", img: "LR" },
+            { n: "موريتانيا", c: "نواكشوط", p: "5,000,000", cr: "أوقية موريتانية", img: "MR" },
+            { n: "الكونغو الديمقراطية", c: "كينشاسا", p: "102,000,000", cr: "فرنك كونغولي", img: "CD" },
+            { n: "الكونغو", c: "برازافيل", p: "6,000,000", cr: "فرنك وسط أفريقيا", img: "CG" },
+            { n: "ناميبيا", c: "ويندهوك", p: "2,700,000", cr: "دولار ناميبي", img: "NA" },
+            { n: "بوتسوانا", c: "غابورون", p: "2,600,000", cr: "بولا بوتسواني", img: "BW" },
+            { n: "ليسوتو", c: "ماسيرو", p: "2,300,000", cr: "لوتي ليسوتو", img: "LS" },
+            { n: "غامبيا", c: "بانجول", p: "2,800,000", cr: "دالاسي غامبي", img: "GM" },
+            { n: "الغابون", c: "ليبرفيل", p: "2,400,000", cr: "فرنك وسط أفريقيا", img: "GA" },
+            { n: "غينيا بيساو", c: "بيساو", p: "2,100,000", cr: "فرنك غرب أفريقيا", img: "GW" },
+            { n: "موريشيوس", c: "بورت لويس", p: "1,300,000", cr: "روبية موريشيوسية", img: "MU" },
+            { n: "إسواتيني", c: "مبابان", p: "1,200,000", cr: "ليلانغيني سوادي", img: "SZ" },
+            { n: "جيبوتي", c: "جيبوتي", p: "1,100,000", cr: "فرنك جيبوتي", img: "DJ" },
+            { n: "جزر القمر", c: "موروني", p: "850,000", cr: "فرنك قمري", img: "KM" },
+            { n: "غينيا الاستوائية", c: "مالابو", p: "1,700,000", cr: "فرنك وسط أفريقيا", img: "GQ" },
+            { n: "الرأس الأخضر", c: "برايا", p: "590,000", cr: "إيسكودو الرأس الأخضر", img: "CV" },
+            { n: "ساو تومي وبرينسيب", c: "ساو تومي", p: "230,000", cr: "دوبرا ساو تومية", img: "ST" },
+            { n: "سيشل", c: "فيكتوريا", p: "107,000", cr: "روبية سيشلية", img: "SC" }
+        ];
+
+        const grid = document.getElementById('mainGrid');
+        
+        function displayCountries(data) {
+            if(data.length === 0) {
+                grid.classList.add('hidden');
+                document.getElementById('noResults').classList.remove('hidden');
+            } else {
+                grid.classList.remove('hidden');
+                document.getElementById('noResults').classList.add('hidden');
+            }
+
+            grid.innerHTML = data.map(item => `
+                <div class="country-card bg-white rounded-2xl overflow-hidden flex flex-col">
+                    <div class="h-32 bg-gray-100 flex items-center justify-center relative">
+                        <span class="text-4xl font-bold text-gray-200 select-none">${item.img}</span>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent"></div>
+                    </div>
+                    <div class="p-5 flex-1">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-lg font-bold text-gray-800">${item.n}</h3>
+                            <span class="bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded-full font-bold">AFRICA</span>
+                        </div>
+                        <div class="space-y-2.5">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">العاصمة</span>
+                                <span class="font-medium text-gray-700">${item.c}</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">السكان</span>
+                                <span class="font-medium text-gray-700">${item.p}</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">العملة</span>
+                                <span class="font-medium text-emerald-600">${item.cr}</span>
+                            </div>
+                        </div>
+                        <button class="w-full mt-5 py-2.5 text-xs font-bold text-gray-500 hover:text-white hover:bg-blue-600 border border-gray-100 hover:border-blue-600 rounded-xl transition-all">
+                            عرض التحليلات الاقتصادية
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function searchData() {
+            const val = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = africaDB.filter(x => 
+                x.n.toLowerCase().includes(val) || 
+                x.c.toLowerCase().includes(val) || 
+                x.cr.toLowerCase().includes(val)
+            );
+            displayCountries(filtered);
+            document.getElementById('totalCount').innerText = filtered.length;
+        }
+
+        // إطلاق العرض الأولي
+        displayCountries(africaDB);
+    </script>
+</body>
+</html>
